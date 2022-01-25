@@ -54,7 +54,8 @@ const Orders = () => {
   const [orders, setOrders] = useState([])
   const [dProfiles, setDProfiles] = useState([])
   const [visible, setVisible] = useState(false)
-  const [profile, setProfile] = useState(false)
+  const [profile, setProfile] = useState({})
+  const [orderId, setOrderId] = useState(null)
   var config1 = {
     method: 'get',
     url: 'http://localhost:8300/api/v1/order-service/get/all-orders',
@@ -92,13 +93,38 @@ const Orders = () => {
 
   const dProfileHandler = (e) => {
     setProfile(e.target.value)
-    console.log(`delivery man`, e.target.value)
   }
-  const updateOrder = () => {
-    console.log(profile)
+  const updateOrder = (orderId) => {
+    setVisible(!visible)
+    setOrderId(orderId)
+  }
+  const assignDeliveryMan = () => {
+    var data = JSON.stringify({
+      orderId: orderId,
+      deliveryManUsername: profile,
+    })
+    var config3 = {
+      method: 'post',
+      url: 'http://localhost:8300/api/v1/order-service/order/update/delivery/profile',
+      headers: {
+        Authorization: 'Bearer d689d948-6aa8-40a4-b9b7-2528f91a28c7',
+        'Content-Type': 'application/json',
+        Cookie: 'JSESSIONID=7C46F037CD5C465A3C83752A0D48D974',
+      },
+      data: data,
+    }
+    axios(config3)
+      .then(function (response) {
+        console.log(JSON.stringify(response.data))
+        setOrderId(null)
+      })
+      .catch(function (error) {
+        console.log(error)
+      })
     setVisible(false)
     setProfile(null)
   }
+  console.log(orders)
   console.log(dProfiles)
   return (
     <>
@@ -169,7 +195,10 @@ const Orders = () => {
                         <div>COD </div>
                       </CTableDataCell>
                       <CTableDataCell className="text-center">
-                        <CButton onClick={() => setVisible(!visible)}>Assign Delivery man</CButton>
+                        {(item.deliveryMan === null) | (item.deliveryMan === '')
+                          ? 'assigned'
+                          : 'not assigned'}
+                        <CButton onClick={() => updateOrder(item.id)}>Assign Delivery man</CButton>
                         <CModal
                           alignment="center"
                           visible={visible}
@@ -186,9 +215,9 @@ const Orders = () => {
                                 onChange={dProfileHandler}
                               >
                                 <option>Select Delivery Man</option>
-                                {dProfiles.map((item, index) => (
-                                  <option value={item} key={index}>
-                                    {item.firstName}---{item.username}
+                                {dProfiles.map((profile, index) => (
+                                  <option value={profile.username} key={index}>
+                                    {profile.firstName}---{profile.username}
                                   </option>
                                 ))}
                               </CFormSelect>
@@ -198,7 +227,7 @@ const Orders = () => {
                             <CButton color="secondary" onClick={() => setVisible(false)}>
                               Close
                             </CButton>
-                            <CButton color="primary" onClick={() => updateOrder(item.id)}>
+                            <CButton color="primary" onClick={() => assignDeliveryMan()}>
                               Update order
                             </CButton>
                           </CModalFooter>
