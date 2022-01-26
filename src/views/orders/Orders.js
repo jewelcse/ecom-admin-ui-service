@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import {
   CAvatar,
   CButton,
@@ -22,6 +23,7 @@ import {
   CModalBody,
   CModalFooter,
   CFormSelect,
+  CBadge,
 } from '@coreui/react'
 import { CChartLine } from '@coreui/react-chartjs'
 import { getStyle, hexToRgba } from '@coreui/utils'
@@ -56,11 +58,12 @@ const Orders = () => {
   const [visible, setVisible] = useState(false)
   const [profile, setProfile] = useState({})
   const [orderId, setOrderId] = useState(null)
+  const [isLoading, setIsloading] = useState(true)
   var config1 = {
     method: 'get',
     url: 'http://localhost:8300/api/v1/order-service/get/all-orders',
     headers: {
-      Authorization: 'bearer d689d948-6aa8-40a4-b9b7-2528f91a28c7',
+      Authorization: 'bearer 07fa274e-0c8e-4880-ba84-fe865c700774',
       Cookie: 'JSESSIONID=1FB41C1B596FE965B3DB460F3A6B1761',
     },
   }
@@ -76,6 +79,7 @@ const Orders = () => {
     axios(config1)
       .then(function (response) {
         setOrders(response.data.data)
+        setIsloading(false)
       })
       .catch(function (error) {
         console.log(error)
@@ -107,7 +111,7 @@ const Orders = () => {
       method: 'post',
       url: 'http://localhost:8300/api/v1/order-service/order/update/delivery/profile',
       headers: {
-        Authorization: 'Bearer d689d948-6aa8-40a4-b9b7-2528f91a28c7',
+        Authorization: 'Bearer 07fa274e-0c8e-4880-ba84-fe865c700774',
         'Content-Type': 'application/json',
         Cookie: 'JSESSIONID=7C46F037CD5C465A3C83752A0D48D974',
       },
@@ -144,12 +148,28 @@ const Orders = () => {
                     </CCol>
                     <CCol sm={6}>
                       <div className="border-start border-start-4 border-start-danger py-1 px-3 mb-3">
+                        <div className="text-medium-emphasis small">Completed Orders</div>
+                        <div className="fs-5 fw-semibold">22,643</div>
+                      </div>
+                    </CCol>
+                  </CRow>
+                  <hr className="mt-0" />
+                </CCol>
+                <CCol xs={12} md={6} xl={6}>
+                  <CRow>
+                    <CCol sm={6}>
+                      <div className="border-start border-start-4 border-start-info py-1 px-3">
+                        <div className="text-medium-emphasis small">Canceled Orders</div>
+                        <div className="fs-5 fw-semibold">9,123</div>
+                      </div>
+                    </CCol>
+                    <CCol sm={6}>
+                      <div className="border-start border-start-4 border-start-danger py-1 px-3 mb-3">
                         <div className="text-medium-emphasis small">Recurring Clients</div>
                         <div className="fs-5 fw-semibold">22,643</div>
                       </div>
                     </CCol>
                   </CRow>
-
                   <hr className="mt-0" />
                 </CCol>
               </CRow>
@@ -163,14 +183,14 @@ const Orders = () => {
                     <CTableHeaderCell className="text-center">Customer</CTableHeaderCell>
                     <CTableHeaderCell className="text-center">Qty</CTableHeaderCell>
                     <CTableHeaderCell className="text-center">Total Amount</CTableHeaderCell>
+                    <CTableHeaderCell className="text-center">Status</CTableHeaderCell>
                     <CTableHeaderCell className="text-center">Priority</CTableHeaderCell>
                     <CTableHeaderCell className="text-center">Payment Method</CTableHeaderCell>
-                    <CTableHeaderCell className="text-center">Status</CTableHeaderCell>
-                    <CTableHeaderCell className="text-center">Assign Delivery Man</CTableHeaderCell>
                     <CTableHeaderCell className="text-center">Action</CTableHeaderCell>
                   </CTableRow>
                 </CTableHead>
                 <CTableBody>
+                  {isLoading && <p>Loading....</p>}
                   {orders.map((item, index) => (
                     <CTableRow v-for="item in tableItems" key={index}>
                       <CTableDataCell>
@@ -186,7 +206,26 @@ const Orders = () => {
                         <strong className="text-center">{item.totalAmount}</strong>
                       </CTableDataCell>
                       <CTableDataCell>
-                        <small className="text-medium-emphasis">{item.status}</small>
+                        {item.status === 'DONE' && (
+                          <CBadge color="primary" shape="rounded-pill">
+                            {item.status}
+                          </CBadge>
+                        )}
+                        {item.status === 'PAID' && (
+                          <CBadge color="success" shape="rounded-pill">
+                            {item.status}
+                          </CBadge>
+                        )}
+                        {item.status === 'CANCELED' && (
+                          <CBadge color="danger" shape="rounded-pill">
+                            {item.status}
+                          </CBadge>
+                        )}
+                        {item.status === 'PROCESSING' && (
+                          <CBadge color="warning" shape="rounded-pill">
+                            {item.status}
+                          </CBadge>
+                        )}
                       </CTableDataCell>
                       <CTableDataCell className="text-center">
                         <div className="text-center">{item.priority} </div>
@@ -194,7 +233,7 @@ const Orders = () => {
                       <CTableDataCell className="text-center">
                         <div>COD </div>
                       </CTableDataCell>
-                      <CTableDataCell className="text-center">
+                      {/* <CTableDataCell className="text-center">
                         {(item.deliveryMan === null) | (item.deliveryMan === '')
                           ? 'assigned'
                           : 'not assigned'}
@@ -232,10 +271,15 @@ const Orders = () => {
                             </CButton>
                           </CModalFooter>
                         </CModal>
-                      </CTableDataCell>
+                      </CTableDataCell> */}
                       <CTableDataCell className="text-center">
                         <CButtonGroup role="group" aria-label="Basic example">
-                          <CButton color="primary">View</CButton>
+                          <Link to={'/details/' + item.id} className="text-center m-1">
+                            Details
+                          </Link>
+                          {/* <Link to={'/details'} className="text-center m-1">
+                            Details22
+                          </Link> */}
                         </CButtonGroup>
                       </CTableDataCell>
                     </CTableRow>
