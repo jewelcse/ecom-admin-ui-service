@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { token } from '../token'
 import { BrowserRouter as Router, Link, Route, useParams } from 'react-router-dom'
 var axios = require('axios')
 
@@ -14,7 +15,7 @@ const OrdersDetail = () => {
     method: 'get',
     url: 'http://localhost:8300/api/v1/order-service/get/order-details/' + params.orderId,
     headers: {
-      Authorization: 'Bearer 07fa274e-0c8e-4880-ba84-fe865c700774',
+      Authorization: 'Bearer ' + token,
     },
   }
   var config3 = {
@@ -47,6 +48,7 @@ const OrdersDetail = () => {
         console.log(error)
       })
   }, [])
+  useEffect(() => {}, [orderDetails])
   console.log(dProfiles)
   const dPHandler = (e) => {
     setDProfile(e.target.value)
@@ -60,7 +62,7 @@ const OrdersDetail = () => {
       method: 'post',
       url: 'http://localhost:8300/api/v1/order-service/order/update/delivery/profile',
       headers: {
-        Authorization: 'Bearer 07fa274e-0c8e-4880-ba84-fe865c700774',
+        Authorization: 'Bearer ' + token,
         'Content-Type': 'application/json',
         Cookie: 'JSESSIONID=7C46F037CD5C465A3C83752A0D48D974',
       },
