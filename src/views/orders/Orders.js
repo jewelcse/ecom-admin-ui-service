@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { token } from '../token'
 import {
   CAvatar,
   CButton,
@@ -63,7 +64,7 @@ const Orders = () => {
     method: 'get',
     url: 'http://localhost:8300/api/v1/order-service/get/all-orders',
     headers: {
-      Authorization: 'bearer 07fa274e-0c8e-4880-ba84-fe865c700774',
+      Authorization: 'bearer ' + token,
       Cookie: 'JSESSIONID=1FB41C1B596FE965B3DB460F3A6B1761',
     },
   }
@@ -111,7 +112,7 @@ const Orders = () => {
       method: 'post',
       url: 'http://localhost:8300/api/v1/order-service/order/update/delivery/profile',
       headers: {
-        Authorization: 'Bearer 07fa274e-0c8e-4880-ba84-fe865c700774',
+        Authorization: 'Bearer ' + token,
         'Content-Type': 'application/json',
         Cookie: 'JSESSIONID=7C46F037CD5C465A3C83752A0D48D974',
       },
